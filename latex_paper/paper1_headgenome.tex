@@ -99,8 +99,15 @@ Using prompt-contrast entropy $\Delta H$ at fixed length, heads are assigned to 
 \end{itemize}
 Because retrieval requires $\Delta H \ge +0.30$ and induction requires $\Delta H \le -0.50$, these classes are mutually exclusive by definition.
 
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/headgenome_atlas_4types.png}
+\caption{The HeadGenome Atlas: Physical 2D layer-by-head anatomical matrix displaying the spatial deployment of the 4 behavioral attention head types across $N=1,568$ heads in GPT-2 (24L $\times$ 16H), Qwen-2.5-0.5B (24L $\times$ 14H), Qwen-2.5-1.5B (28L $\times$ 12H), and LLaMA-3.2-1B (16L $\times$ 32H). Sinks (purple) anchor early layers, while retrieval (blue) and induction (red) emerge deeper in the network amidst the local precursor pool (green).}
+\label{fig:headgenome_atlas}
+\end{figure*}
+
 \subsection{LLaMA Sink Threshold Artifact}
-In LLaMA-3.2-1B, applying the rigid $<0.10$ bits threshold yielded exactly 0 sink heads. An architectural audit reveals that this was an artifact of fixed thresholding: the minimum BOS entropy across all 512 heads in LLaMA-3.2-1B is $0.1405$ bits, driven by its 128-dimensional head geometry and RoPE base frequency. Relaxing the threshold to $<0.50$ bits uncovers 70 attention sinks ($13.7\%$ of all heads), and $<1.0$ bits identifies 200 sinks ($39.1\%$). Heuristic thresholding must account for architecture-dependent baseline distributions.
+In LLaMA-3.2-1B, applying the rigid $<0.10$ bits threshold yielded exactly 0 sink heads (Figure~\ref{fig:headgenome_atlas}). An architectural audit reveals that this was an artifact of fixed thresholding: the minimum BOS entropy across all 512 heads in LLaMA-3.2-1B is $0.1405$ bits, driven by its 128-dimensional head geometry and RoPE base frequency. Relaxing the threshold to $<0.50$ bits uncovers 70 attention sinks ($13.7\%$ of all heads), and $<1.0$ bits identifies 200 sinks ($39.1\%$). Heuristic thresholding must account for architecture-dependent baseline distributions.
 
 \subsection{GQA Query Head Independence}
 Grouped-Query Attention (GQA) shares key and value projection matrices across groups of query heads. We tested whether GQA forces sibling query heads to share functional specializations. Across all 128 GQA groups in LLaMA-3.2-1B (32 query heads, 8 KV heads; 4 query heads per group), \textbf{35 of 128 groups (27.3\%)} contain query heads assigned conflicting behavioral labels. Furthermore, within-group $\Delta H$ variance accounts for \textbf{33.6\%} of total $\Delta H$ variance across the entire model. Because each query head has an independent linear projection $W_Q$, query heads attend to distinct patterns despite shared keys and values.
