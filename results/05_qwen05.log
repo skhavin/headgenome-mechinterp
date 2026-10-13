@@ -1,0 +1,115 @@
+[transformers] `torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 12767.78it/s]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Computing Olsson and Wu scores...
+
+=======================================================
+EVALUATING Qwen-0.5B (L=24, H=14, N=100)
+=======================================================
+[W1013 17:00:32.157248707 CUDACachingAllocator.cpp:3934] memory allocation failed with OOM on device 0 while trying to allocate 312475648 bytes (free: 318046208, total: 4007591936).
+DENSE: NIAH=1.000 [0.963, 1.0] PPL=20.01
+
+--- Ablation Mode: MEAN ---
+  [mean] canonical_retrieval    (k= 3): NIAH=1.000 [0.963, 1.0] PPL=20.28
+  [mean] top_wu_retrieval       (k= 4): NIAH=0.370 [0.2818, 0.4678] PPL=20.25
+  [mean] canonical_induction    (k=36): NIAH=0.760 [0.6677, 0.8331] PPL=22.70
+  [mean] top_olsson_induction   (k=36): NIAH=0.030 [0.0103, 0.0845] PPL=23.89
+  [mean] canonical_both         (k=39): NIAH=0.670 [0.5731, 0.7544] PPL=23.06
+  [mean] canonical_sink         (k= 9): NIAH=0.980 [0.93, 0.9945] PPL=21.50
+--- Ablation Mode: ZERO ---
+  [zero] canonical_retrieval    (k= 3): NIAH=1.000 [0.963, 1.0] PPL=20.53
+  [zero] top_wu_retrieval       (k= 4): NIAH=0.310 [0.2278, 0.4063] PPL=20.23
+  [zero] canonical_induction    (k=36): NIAH=0.790 [0.7002, 0.8583] PPL=22.96
+  [zero] top_olsson_induction   (k=36): NIAH=0.030 [0.0103, 0.0845] PPL=24.87
+  [zero] canonical_both         (k=39): NIAH=0.730 [0.6357, 0.8073] PPL=23.58
+  [zero] canonical_sink         (k= 9): NIAH=0.960 [0.9016, 0.9843] PPL=22.52
+
+--- Random Controls for Induction (k=36 heads, mean mode) ---
+-> Running Control A: Globally Dispersed (max 2 heads/layer)...
+   Dispersed: Mean=0.619 Med=0.690 Range=[0.000, 1.000]
+-> Running Control B: Layer-Matched Unrestricted (tracking sinks hit)...
+   Unrestricted: Mean=0.129 Med=0.015 Range=[0.000, 0.870]
+   Sink Regression: R²=0.1556, p=8.5280e-02
+-> Running Control C: Layer-Matched Local-Only...
+   Local-Only:   Mean=0.134 Med=0.025 Range=[0.000, 0.630]
+
+--- Running Activation Patching Causal Recovery (N=20 pairs) ---
+Traceback (most recent call last):
+  File "/var/mnt/d_drive/PROJECTS/webstromprojects/attentionheadgenome/paper1_headgenome_mechinterp/scripts/05_rigorous_unconfounded_suite.py", line 503, in <module>
+    main()
+  File "/var/mnt/d_drive/PROJECTS/webstromprojects/attentionheadgenome/paper1_headgenome_mechinterp/scripts/05_rigorous_unconfounded_suite.py", line 490, in main
+    patch_recovery = eval_activation_patching(model, hk, tok, words, patch_sets, n_pairs=20)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/mnt/d_drive/PROJECTS/webstromprojects/attentionheadgenome/paper1_headgenome_mechinterp/.venv/lib64/python3.12/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/var/mnt/d_drive/PROJECTS/webstromprojects/attentionheadgenome/paper1_headgenome_mechinterp/scripts/05_rigorous_unconfounded_suite.py", line 297, in eval_activation_patching
+    lg_p = model(io.cuda()).logits[0, -1].float()
+           ^^^^^^^^^^^^^^^^
+  File "/var/mnt/d_drive/PROJECTS/webstromprojects/attentionheadgenome/paper1_headgenome_mechinterp/.venv/lib64/python3.12/site-packages/torch/nn/modules/module.py", line 1783, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/mnt/d_drive/PROJECTS/webstromprojects/attentionheadgenome/paper1_headgenome_mechinterp/.venv/lib64/python3.12/site-packages/torch/nn/modules/module.py", line 1794, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/mnt/d_drive/PROJECTS/webstromprojects/attentionheadgenome/paper1_headgenome_mechinterp/.venv/lib64/python3.12/site-packages/transformers/utils/generic.py", line 943, in wrapper
+    output = func(self, *args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/mnt/d_drive/PROJECTS/webstromprojects/attentionheadgenome/paper1_headgenome_mechinterp/.venv/lib64/python3.12/site-packages/transformers/models/qwen2/modeling_qwen2.py", line 444, in forward
+    outputs: BaseModelOutputWithPast = self.model(
+                                       ^^^^^^^^^^^
+  File "/var/mnt/d_drive/PROJECTS/webstromprojects/attentionheadgenome/paper1_headgenome_mechinterp/.venv/lib64/python3.12/site-packages/torch/nn/modules/module.py", line 1783, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/mnt/d_drive/PROJECTS/webstromprojects/attentionheadgenome/paper1_headgenome_mechinterp/.venv/lib64/python3.12/site-packages/torch/nn/modules/module.py", line 1794, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/mnt/d_drive/PROJECTS/webstromprojects/attentionheadgenome/paper1_headgenome_mechinterp/.venv/lib64/python3.12/site-packages/transformers/utils/generic.py", line 1081, in wrapper
+    output = func(self, *args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/mnt/d_drive/PROJECTS/webstromprojects/attentionheadgenome/paper1_headgenome_mechinterp/.venv/lib64/python3.12/site-packages/transformers/utils/output_capturing.py", line 287, in wrapper
+    outputs = func(self, *args, **kwargs)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/mnt/d_drive/PROJECTS/webstromprojects/attentionheadgenome/paper1_headgenome_mechinterp/.venv/lib64/python3.12/site-packages/transformers/models/qwen2/modeling_qwen2.py", line 380, in forward
+    hidden_states = decoder_layer(
+                    ^^^^^^^^^^^^^^
+  File "/var/mnt/d_drive/PROJECTS/webstromprojects/attentionheadgenome/paper1_headgenome_mechinterp/.venv/lib64/python3.12/site-packages/transformers/modeling_layers.py", line 110, in __call__
+    return super().__call__(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/mnt/d_drive/PROJECTS/webstromprojects/attentionheadgenome/paper1_headgenome_mechinterp/.venv/lib64/python3.12/site-packages/torch/nn/modules/module.py", line 1783, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/mnt/d_drive/PROJECTS/webstromprojects/attentionheadgenome/paper1_headgenome_mechinterp/.venv/lib64/python3.12/site-packages/torch/nn/modules/module.py", line 1889, in _call_impl
+    return inner()
+           ^^^^^^^
+  File "/var/mnt/d_drive/PROJECTS/webstromprojects/attentionheadgenome/paper1_headgenome_mechinterp/.venv/lib64/python3.12/site-packages/torch/nn/modules/module.py", line 1837, in inner
+    result = forward_call(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/mnt/d_drive/PROJECTS/webstromprojects/attentionheadgenome/paper1_headgenome_mechinterp/.venv/lib64/python3.12/site-packages/transformers/models/qwen2/modeling_qwen2.py", line 274, in forward
+    hidden_states, _ = self.self_attn(
+                       ^^^^^^^^^^^^^^^
+  File "/var/mnt/d_drive/PROJECTS/webstromprojects/attentionheadgenome/paper1_headgenome_mechinterp/.venv/lib64/python3.12/site-packages/torch/nn/modules/module.py", line 1783, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/mnt/d_drive/PROJECTS/webstromprojects/attentionheadgenome/paper1_headgenome_mechinterp/.venv/lib64/python3.12/site-packages/torch/nn/modules/module.py", line 1889, in _call_impl
+    return inner()
+           ^^^^^^^
+  File "/var/mnt/d_drive/PROJECTS/webstromprojects/attentionheadgenome/paper1_headgenome_mechinterp/.venv/lib64/python3.12/site-packages/torch/nn/modules/module.py", line 1837, in inner
+    result = forward_call(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/mnt/d_drive/PROJECTS/webstromprojects/attentionheadgenome/paper1_headgenome_mechinterp/.venv/lib64/python3.12/site-packages/transformers/models/qwen2/modeling_qwen2.py", line 225, in forward
+    attn_output = self.o_proj(attn_output)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/mnt/d_drive/PROJECTS/webstromprojects/attentionheadgenome/paper1_headgenome_mechinterp/.venv/lib64/python3.12/site-packages/torch/nn/modules/module.py", line 1783, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/mnt/d_drive/PROJECTS/webstromprojects/attentionheadgenome/paper1_headgenome_mechinterp/.venv/lib64/python3.12/site-packages/torch/nn/modules/module.py", line 1889, in _call_impl
+    return inner()
+           ^^^^^^^
+  File "/var/mnt/d_drive/PROJECTS/webstromprojects/attentionheadgenome/paper1_headgenome_mechinterp/.venv/lib64/python3.12/site-packages/torch/nn/modules/module.py", line 1826, in inner
+    args_result = hook(self, args)
+                  ^^^^^^^^^^^^^^^^
+  File "/var/mnt/d_drive/PROJECTS/webstromprojects/attentionheadgenome/paper1_headgenome_mechinterp/scripts/05_rigorous_unconfounded_suite.py", line 95, in hook
+    x[..., sl] = self.patch[l][..., sl]
+    ~^^^^^^^^^
+RuntimeError: The expanded size of the tensor (358) must match the existing size (375) at non-singleton dimension 1.  Target sizes: [1, 358, 64].  Tensor sizes: [375, 64]

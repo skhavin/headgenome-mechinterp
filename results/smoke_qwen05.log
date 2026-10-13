@@ -1,0 +1,48 @@
+[transformers] `torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 14364.05it/s]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Qwen-0.5B {'model': 'Qwen-0.5B', 'L': 24, 'H': 14, 'head_dim': 64, 'n_trials': 20, 'n_words': 20, 'prompt_tokens': 836}
+stage1 done {"AUC_induction_label_vs_induction_score": 0.7901851851851851, "AUC_retrieval_label_vs_retrieval_hit": 0.4294294294294294, "AUC_retrieval_label_vs_retrieval_mass": 0.3563563563563563}
+[mean] dense                    n=  0 NIAH=1.00 PPL=17.46
+[mean] retrieval                n=  3 NIAH=1.00 PPL=17.64
+[mean] rand_retrieval_s0        n=  3 NIAH=1.00 PPL=17.71
+[mean] rand_retrieval_s1        n=  3 NIAH=1.00 PPL=17.70
+[mean] rand_retrieval_s2        n=  3 NIAH=1.00 PPL=17.87
+[mean] induction                n= 36 NIAH=0.75 PPL=19.89
+[mean] rand_induction_s0        n= 36 NIAH=0.20 PPL=24.50
+[mean] rand_induction_s1        n= 36 NIAH=0.10 PPL=24.54
+[mean] rand_induction_s2        n= 36 NIAH=0.05 PPL=24.44
+[mean] both                     n= 39 NIAH=0.60 PPL=20.23
+[mean] rand_both_s0             n= 39 NIAH=0.00 PPL=25.15
+[mean] rand_both_s1             n= 39 NIAH=0.50 PPL=26.72
+[mean] rand_both_s2             n= 39 NIAH=0.00 PPL=23.82
+[mean] sink                     n=  9 NIAH=1.00 PPL=18.97
+[mean] rand_sink_s0             n=  9 NIAH=0.55 PPL=18.06
+[mean] rand_sink_s1             n=  9 NIAH=1.00 PPL=18.21
+[mean] rand_sink_s2             n=  9 NIAH=1.00 PPL=17.83
+[mean] topk_retrieval_score     n=  3 NIAH=1.00 PPL=17.73
+[mean] topk_induction_score     n= 36 NIAH=0.10 PPL=23.04
+[mean] topk_both_scores         n= 36 NIAH=0.10 PPL=23.04
+[zero] dense                    n=  0 NIAH=1.00 PPL=17.46
+[zero] retrieval                n=  3 NIAH=1.00 PPL=17.90
+[zero] rand_retrieval_s0        n=  3 NIAH=1.00 PPL=17.75
+[zero] rand_retrieval_s1        n=  3 NIAH=1.00 PPL=17.77
+[zero] rand_retrieval_s2        n=  3 NIAH=1.00 PPL=17.86
+[zero] induction                n= 36 NIAH=0.80 PPL=20.27
+[zero] rand_induction_s0        n= 36 NIAH=0.10 PPL=24.52
+[zero] rand_induction_s1        n= 36 NIAH=0.05 PPL=24.03
+[zero] rand_induction_s2        n= 36 NIAH=0.05 PPL=24.71
+[zero] both                     n= 39 NIAH=0.75 PPL=20.91
+[zero] rand_both_s0             n= 39 NIAH=0.10 PPL=25.38
+[zero] rand_both_s1             n= 39 NIAH=0.45 PPL=26.74
+[zero] rand_both_s2             n= 39 NIAH=0.00 PPL=25.74
+[zero] sink                     n=  9 NIAH=1.00 PPL=20.06
+[zero] rand_sink_s0             n=  9 NIAH=0.55 PPL=18.41
+[zero] rand_sink_s1             n=  9 NIAH=1.00 PPL=18.31
+[zero] rand_sink_s2             n=  9 NIAH=0.95 PPL=18.27
+[zero] topk_retrieval_score     n=  3 NIAH=1.00 PPL=17.73
+[zero] topk_induction_score     n= 36 NIAH=0.10 PPL=24.12
+[zero] topk_both_scores         n= 36 NIAH=0.10 PPL=24.12
+noising {'retrieval': -0.002, 'rand_retrieval_s0': 0.004, 'rand_retrieval_s1': -0.0, 'rand_retrieval_s2': -0.0, 'induction': 0.174, 'rand_induction_s0': 0.058, 'rand_induction_s1': 0.019, 'rand_induction_s2': 0.009, 'both': 0.173, 'rand_both_s0': 0.038, 'rand_both_s1': 0.054, 'rand_both_s2': 0.011, 'sink': 0.002, 'topk_retrieval_score': 0.155, 'topk_induction_score': 0.647}
+denoising {'retrieval': -0.001, 'rand_retrieval_s0': 0.002, 'rand_retrieval_s1': -0.002, 'rand_retrieval_s2': -0.001, 'induction': 0.178, 'rand_induction_s0': 0.052, 'rand_induction_s1': 0.014, 'rand_induction_s2': 0.005, 'both': 0.177, 'rand_both_s0': 0.025, 'rand_both_s1': 0.048, 'rand_both_s2': 0.002, 'sink': 0.01, 'topk_retrieval_score': 0.161, 'topk_induction_score': 0.677}
+saved 177.29839277267456

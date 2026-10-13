@@ -1,0 +1,111 @@
+{
+  "vq_random_init_null": {
+    "GPT-2": {
+      "seeds": [
+        {
+          "seed": 42,
+          "r": 0.04245955473281829,
+          "p": 0.4067108728988848,
+          "mean_vq": 1.0002237972803414,
+          "std_vq": 0.004054253577723108
+        },
+        {
+          "seed": 100,
+          "r": -0.02580348246768372,
+          "p": 0.6142062697561586,
+          "mean_vq": 0.9997551816826066,
+          "std_vq": 0.004007958739213789
+        },
+        {
+          "seed": 2024,
+          "r": 0.08946501464418923,
+          "p": 0.07995516531680118,
+          "mean_vq": 0.999833571879814,
+          "std_vq": 0.0038649382606839823
+        }
+      ],
+      "mean_r": 0.035373695636441264,
+      "summary": "Untrained random weights have r \u2248 0.0 with depth; the V/Q gradient emerges entirely through training."
+    },
+    "Qwen-0.5B": {
+      "seeds": [
+        {
+          "seed": 42,
+          "r": 0.01321999027292426,
+          "p": 0.8092188282535537,
+          "mean_vq": 0.9996628534226191,
+          "std_vq": 0.0055263142779268665
+        },
+        {
+          "seed": 100,
+          "r": 0.1264680993216678,
+          "p": 0.020401674608148533,
+          "mean_vq": 1.0001395089285714,
+          "std_vq": 0.005604139241450831
+        },
+        {
+          "seed": 2024,
+          "r": 0.0018651751719202803,
+          "p": 0.9728278341968225,
+          "mean_vq": 1.0001743861607142,
+          "std_vq": 0.005852901143440774
+        }
+      ],
+      "mean_r": 0.04718442158883745,
+      "summary": "Untrained random weights have r \u2248 0.0 with depth; the V/Q gradient emerges entirely through training."
+    },
+    "Llama-3.2-1B": {
+      "seeds": [
+        {
+          "seed": 42,
+          "r": -0.010155052672640073,
+          "p": 0.8186925672364985,
+          "mean_vq": 1.0006332397460938,
+          "std_vq": 0.004155933661630133
+        },
+        {
+          "seed": 100,
+          "r": 0.044630057874916335,
+          "p": 0.3135039422782565,
+          "mean_vq": 1.0007858276367188,
+          "std_vq": 0.004320252019293307
+        },
+        {
+          "seed": 2024,
+          "r": -0.03131121455425749,
+          "p": 0.47960774775886467,
+          "mean_vq": 1.0010986328125,
+          "std_vq": 0.004440071650262015
+        }
+      ],
+      "mean_r": 0.0010545968826729233,
+      "summary": "Untrained random weights have r \u2248 0.0 with depth; the V/Q gradient emerges entirely through training."
+    }
+  },
+  "gqa_specialization": {
+    "total_groups": 128,
+    "mixed_role_groups": 35,
+    "frac_mixed_role_groups": 0.2734375,
+    "total_delta_variance": 0.0708558884293686,
+    "mean_within_group_variance": 0.023783505360253906,
+    "fraction_variance_within_groups": 0.33566025192051696,
+    "verdict": "Query heads within the same GQA group specialize into different functional classes and exhibit substantial within-group variance (contrary to the speculation that GQA query heads are forced to behave identically)."
+  },
+  "induction_bimodality_audit": {
+    "n_induction_heads": 198,
+    "mean_depth": 0.5122655122655123,
+    "std_depth": 0.14804201587635152,
+    "gmm_bic": {
+      "1": -183.98643174607426,
+      "2": -168.18390355310314,
+      "3": -152.57870651830297
+    },
+    "bic_favors_single_component": true,
+    "skewness": -0.16630135520631625,
+    "kurtosis": 0.06536624080529707,
+    "verdict": "Induction head depths follow a continuous unimodal distribution (BIC k=1 preferred over k=2). The 'Early vs Late' split was defined by an artificial depth >= 0.5 threshold, making subsequent depth-difference tests circular."
+  },
+  "regime_switching_audit": {
+    "critique": "Variance/minimum ratios are mathematically ungrounded when denominators approach machine precision."
+  }
+}

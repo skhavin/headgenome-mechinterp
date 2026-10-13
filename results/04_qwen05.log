@@ -1,0 +1,171 @@
+[transformers] `torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 10825.84it/s]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+
+=== Evaluating Qwen-0.5B (N_trials=100, N_draws=20) ===
+DENSE: NIAH=1.000 [0.963, 1.0] PPL=20.01
+
+--- Running Mode: MEAN ---
+[mean] RETRIEVAL (n=3): NIAH=1.000 [0.963, 1.0] PPL=20.28
+   [Unrestricted Random] Running 20 draws...
+      unres 1/20: niah=1.00
+      unres 2/20: niah=1.00
+      unres 3/20: niah=1.00
+      unres 4/20: niah=1.00
+      unres 5/20: niah=1.00
+      unres 6/20: niah=1.00
+      unres 7/20: niah=1.00
+      unres 8/20: niah=1.00
+      unres 9/20: niah=1.00
+      unres 10/20: niah=1.00
+      unres 11/20: niah=0.95
+      unres 12/20: niah=1.00
+      unres 13/20: niah=1.00
+      unres 14/20: niah=1.00
+      unres 15/20: niah=1.00
+      unres 16/20: niah=1.00
+      unres 17/20: niah=1.00
+      unres 18/20: niah=1.00
+      unres 19/20: niah=0.99
+      unres 20/20: niah=1.00
+   [Local-Only Random] Running 20 draws...
+      local 1/20: niah=1.00
+      local 2/20: niah=1.00
+      local 3/20: niah=1.00
+      local 4/20: niah=0.99
+      local 5/20: niah=1.00
+      local 6/20: niah=1.00
+      local 7/20: niah=1.00
+      local 8/20: niah=1.00
+      local 9/20: niah=1.00
+      local 10/20: niah=0.73
+      local 11/20: niah=0.98
+      local 12/20: niah=1.00
+      local 13/20: niah=0.99
+      local 14/20: niah=1.00
+      local 15/20: niah=1.00
+      local 16/20: niah=1.00
+      local 17/20: niah=0.91
+      local 18/20: niah=0.93
+      local 19/20: niah=1.00
+      local 20/20: niah=1.00
+     => Unrestricted Rand (20 draws): Mean NIAH=0.997 (med 1.000) | Mean PPL=17.52
+     => Local-Only   Rand (20 draws): Mean NIAH=0.976 (med 1.000) | Mean PPL=17.29
+[mean] INDUCTION (n=36): NIAH=0.760 [0.6677, 0.8331] PPL=22.70
+   [Unrestricted Random] Running 20 draws...
+      unres 1/20: niah=0.02
+      unres 2/20: niah=0.00
+      unres 3/20: niah=0.00
+      unres 4/20: niah=0.00
+      unres 5/20: niah=0.01
+      unres 6/20: niah=0.14
+      unres 7/20: niah=0.44
+      unres 8/20: niah=0.12
+      unres 9/20: niah=0.01
+      unres 10/20: niah=0.13
+      unres 11/20: niah=0.00
+      unres 12/20: niah=0.06
+      unres 13/20: niah=0.62
+      unres 14/20: niah=0.00
+      unres 15/20: niah=0.00
+      unres 16/20: niah=0.01
+      unres 17/20: niah=0.00
+      unres 18/20: niah=0.13
+      unres 19/20: niah=0.87
+      unres 20/20: niah=0.02
+   [Local-Only Random] Running 20 draws...
+      local 1/20: niah=0.00
+      local 2/20: niah=0.29
+      local 3/20: niah=0.40
+      local 4/20: niah=0.62
+      local 5/20: niah=0.00
+      local 6/20: niah=0.00
+      local 7/20: niah=0.00
+      local 8/20: niah=0.00
+      local 9/20: niah=0.00
+      local 10/20: niah=0.22
+      local 11/20: niah=0.21
+      local 12/20: niah=0.00
+      local 13/20: niah=0.15
+      local 14/20: niah=0.35
+      local 15/20: niah=0.03
+      local 16/20: niah=0.07
+      local 17/20: niah=0.06
+      local 18/20: niah=0.02
+      local 19/20: niah=0.80
+      local 20/20: niah=0.04
+     => Unrestricted Rand (20 draws): Mean NIAH=0.129 (med 0.015) | Mean PPL=23.14
+     => Local-Only   Rand (20 draws): Mean NIAH=0.163 (med 0.050) | Mean PPL=23.04
+[mean] BOTH (n=39): NIAH=0.670 [0.5731, 0.7544] PPL=23.06
+   [Unrestricted Random] Running 20 draws...
+      unres 1/20: niah=0.00
+      unres 2/20: niah=0.10
+      unres 3/20: niah=0.07
+      unres 4/20: niah=0.00
+      unres 5/20: niah=0.11
+      unres 6/20: niah=0.17
+      unres 7/20: niah=0.47
+      unres 8/20: niah=0.14
+      unres 9/20: niah=0.81
+      unres 10/20: niah=0.65
+      unres 11/20: niah=0.00
+      unres 12/20: niah=0.00
+      unres 13/20: niah=0.17
+      unres 14/20: niah=0.05
+      unres 15/20: niah=0.12
+      unres 16/20: niah=0.01
+      unres 17/20: niah=0.64
+      unres 18/20: niah=0.00
+      unres 19/20: niah=0.01
+      unres 20/20: niah=0.50
+   [Local-Only Random] Running 20 draws...
+      local 1/20: niah=0.16
+      local 2/20: niah=0.45
+      local 3/20: niah=0.60
+      local 4/20: niah=0.05
+      local 5/20: niah=0.00
+      local 6/20: niah=0.09
+      local 7/20: niah=0.00
+      local 8/20: niah=0.00
+      local 9/20: niah=0.00
+      local 10/20: niah=0.25
+      local 11/20: niah=0.14
+      local 12/20: niah=0.10
+      local 13/20: niah=0.38
+      local 14/20: niah=0.15
+      local 15/20: niah=0.71
+      local 16/20: niah=0.00
+      local 17/20: niah=0.24
+      local 18/20: niah=0.12
+      local 19/20: niah=0.00
+      local 20/20: niah=0.04
+     => Unrestricted Rand (20 draws): Mean NIAH=0.201 (med 0.105) | Mean PPL=23.33
+     => Local-Only   Rand (20 draws): Mean NIAH=0.174 (med 0.110) | Mean PPL=24.0
+[mean] SINK (n=9): NIAH=0.980 [0.93, 0.9945] PPL=21.50
+   [Unrestricted Random] Running 20 draws...
+      unres 1/20: niah=0.23
+      unres 2/20: niah=0.99
+      unres 3/20: niah=1.00
+      unres 4/20: niah=0.99
+      unres 5/20: niah=0.83
+      unres 6/20: niah=1.00
+      unres 7/20: niah=0.99
+      unres 8/20: niah=0.98
+      unres 9/20: niah=1.00
+      unres 10/20: niah=0.32
+      unres 11/20: niah=0.99
+      unres 12/20: niah=0.55
+      unres 13/20: niah=0.74
+      unres 14/20: niah=0.99
+      unres 15/20: niah=0.83
+      unres 16/20: niah=0.98
+      unres 17/20: niah=1.00
+      unres 18/20: niah=1.00
+      unres 19/20: niah=0.98
+      unres 20/20: niah=0.91
+   [Local-Only Random] Running 20 draws...
+      local 1/20: niah=0.97
+      local 2/20: niah=0.99
+      local 3/20: niah=0.99
+      local 4/20: niah=0.98
+      local 5/20: niah=0.99
