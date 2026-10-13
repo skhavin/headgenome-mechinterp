@@ -252,13 +252,23 @@ The "perplexity illusion" is a crucial methodological warning:
 
 ---
 
-## 8. Finding 7: GQA Specialization Analysis
+## 8. Finding 7: GQA Specialization Analysis & Causal Scope
 
 The original text argued that Grouped-Query Attention forces query heads to mirror their siblings because they share key-value projections.
 - We analyzed all 128 GQA groups in Llama-3.2-1B (32 query heads, 8 key-value heads = 4 query heads per group).
-- **Mixed Roles:** **35 of 128 groups (27.3%)** contain query heads with different functional labels.
+- **Mixed Roles:** Under the mass-based sink threshold ($H < 0.50$ bits, 70 sinks), **65 of 128 groups (50.8%)** contain query heads with different functional labels (vs expected layer-conditional permutation null of $68.9\% \pm 2.4\%$, $p < 10^{-4}$). Without sinks, **35 of 128 groups (27.3%)** are mixed (vs expected null of $38.0\% \pm 1.8\%$, $p < 10^{-4}$).
 - **Variance:** Within-group $\Delta$ variance accounts for **33.6%** of total $\Delta$ variance across the entire model.
 - Because each query head has an independent linear projection $W_Q$, query heads attend to distinct positions despite shared keys and values.
+
+### 8.1 LLaMA Causal Evaluation Status
+- Causal ablation interventions in Paper 1 systematically cover **720 heads across two model families**: Qwen-2.5-0.5B (336 heads) and GPT-2-medium (384 heads).
+- **LLaMA-3.2-1B has no causal ablation results** in Paper 1: it is audited for static weight geometry ($N=512$), dynamic entropy distributions, BOS sink mass thresholds, and GQA query head independence. Running online causal ablations on LLaMA was halted to prioritize ACL submission readiness.
+
+### 8.2 The Synthetic NIAH Prefix-Matching Induction Confound
+- Standard synthetic NIAH queries repeat the needle prefix verbatim (`The secret word is XXXXX` -> `Answer: The secret word is [target]`).
+- Mechanistically, this converts retrieval into in-context prefix completion ($[A][B] \dots [A] \to [B]$), directly activating induction copying circuits.
+- This explains why Olsson induction heads collapse NIAH ($3.0\%$ in Qwen, $0.0\%$ in GPT-2), while needle-attention heads in GPT-2 barely affect accuracy ($95.0\%$).
+- Unless queries are paraphrased to break verbatim prefix repetition, standard NIAH conflates distant token retrieval with induction copying.
 
 ---
 
