@@ -20,7 +20,11 @@
 \usepackage{xcolor}
 \usepackage{cleveref}
 
-\title{HeadGenome: Dynamic Entropy-Collapse Probing Does Not Isolate Causal Attention Circuits\\A Multi-Architecture Causal and Geometric Audit}
+\setlength{\textfloatsep}{9pt plus 2pt minus 2pt}
+\setlength{\floatsep}{7pt plus 2pt minus 2pt}
+\setlength{\intextsep}{7pt plus 2pt minus 2pt}
+
+\title{HeadGenome: Task-Contrast Dynamic Entropy Probing Does Not Isolate Causal Attention Circuits\\A Multi-Architecture Causal and Geometric Audit}
 
 \author{Anonymous ACL ARR Submission \\
   Paper 1: Mechanistic Interpretability Track \\
@@ -31,7 +35,7 @@
 \maketitle
 
 \begin{abstract}
-Unsupervised diagnostics that classify attention heads into functional taxa---such as retrieval heads, induction heads, and attention sinks---promise scalable circuit discovery without costly task-specific supervision. In this work, we present a causal and geometric audit of dynamic task-contrast entropy probing across 1,568 attention heads in three model families (GPT-2-medium, Qwen-2.5, and LLaMA-3.2), with systematic causal interventions across 720 heads in GPT-2 and Qwen-2.5. We demonstrate that dynamic entropy probing fails to isolate causal circuits: (1) Heads identified as retrieval by entropy collapse are causally inert on long-context Needle-in-a-Haystack (NIAH: 100\% accuracy preserved under ablation), whereas true needle-routing heads collapse accuracy to 37.0\% in Qwen-2.5-0.5B; evaluated against continuous needle-routing attention, the probe achieves an AUC-ROC of only 0.43 [0.21, 0.65], consistent with chance, identifying zero causal knockout heads (0.0\% sensitivity [0.0\%, 49.0\%]). In GPT-2, retrieval exhibits high circuit redundancy (95.0\% vs 100.0\%), showing that no retrieval subset is causally necessary there. (2) Standard synthetic NIAH conflates retrieval with prefix-matching induction due to verbatim prompt repetition, explaining why Olsson heads collapse NIAH (3.0\% in Qwen, 0.0\% in GPT-2). (3) For induction, the probe partially correlates with prefix scores (AUC 0.790) but heavily dilutes the circuit (10.2\% Jaccard overlap with Olsson heads), recovering only +17.8\% on IOI (vs +67.7\% for Olsson heads) and +0.29 nats prefix loss (vs +1.84 nats). (4) Perplexity shifts fail to detect factual retrieval collapse (+0.24 PPL despite a 63\% accuracy drop in Qwen). (5) Weight Frobenius ratios reflect architectural depth gradients rather than functional roles. We conclude that dynamic entropy probing captures statistical recurrence geometry rather than causal mechanisms, and release our unconfounded audit suite.
+Unsupervised diagnostics that classify attention heads into functional taxa---such as retrieval heads, induction heads, and attention sinks---promise scalable circuit discovery without costly task-specific supervision. In this work, we present a causal and geometric audit of dynamic task-contrast entropy probing across 1,568 attention heads in three model families (GPT-2-medium, Qwen-2.5, and LLaMA-3.2), with systematic causal interventions across 720 heads in GPT-2 and Qwen-2.5. We demonstrate that dynamic entropy probing fails to isolate causal circuits: (1) Heads identified as retrieval by entropy collapse are causally inert on long-context Needle-in-a-Haystack (NIAH: 100\% accuracy preserved under ablation), whereas causal needle-routing heads collapse accuracy to 37.0\% in Qwen-2.5-0.5B; evaluated against continuous needle-routing attention, the probe achieves an AUC-ROC of only 0.43 [0.21, 0.65], consistent with chance, identifying zero causal knockout heads (0.0\% sensitivity [0.0\%, 49.0\%]). In GPT-2, retrieval routing exhibits circuit redundancy (95.0\% vs 100.0\%), providing no evidence that a localized retrieval subset is causally necessary there. (2) Standard synthetic NIAH prompts repeat the needle prefix verbatim at query time, creating an induction-like prefix-matching task ($[A][B] \dots [A] \to [B]$); we hypothesize this explains why canonical Olsson induction heads collapse NIAH performance (3.0\% in Qwen, 0.0\% in GPT-2) despite not being specialized for distant semantic retrieval. (3) For induction, the probe correlates with prefix scores (AUC 0.790) but shares limited discrete overlap with Olsson heads (10.2\% Jaccard with standard prefix-score $\ge 0.3$; 16.1\% with top-36 ablated heads), recovering +17.8\% on IOI (vs +67.7\% for Olsson heads) and +0.29 nats prefix loss (vs +1.84 nats). (4) Perplexity shifts fail to detect factual retrieval collapse (+0.24 PPL despite a 63\% accuracy drop in Qwen). (5) Weight Frobenius ratios reflect architectural depth gradients rather than functional roles. We conclude that dynamic entropy probing captures statistical recurrence geometry rather than causal mechanisms, and release our diagnostic audit suite.
 \end{abstract}
 
 \section{Introduction}
@@ -51,11 +55,11 @@ Task-contrast attention sharpening is an intuitive diagnostic for unsupervised c
 Our contributions are as follows:
 \begin{itemize}
     \setlength{\itemsep}{1pt}
-    \item \textbf{Causal Dissociation in Retrieval:} Probed retrieval heads (layers 1, 4, 6 in Qwen; layers 1, 3, 5, 11, 14, 15, 18, 23 in GPT-2) are causally inert on Needle-in-a-Haystack (NIAH: $100.0\% \to 100.0\%$). True needle-routing heads in Qwen reside in late layers (15--19), where ablating the top 4 heads (calibrated on 20 trials, evaluated on 100 disjoint trials) collapses accuracy to $37.0\%$ [$28.2\%, 46.8\%$] (while 20 draws of layer-matched late controls retain $97.6\% \pm 1.4\%$). In GPT-2, retrieval routing exhibits high circuit redundancy ($95.0\%$ preserved under 13-head ablation), showing that no localized retrieval set is causally necessary there. Evaluated against continuous needle-routing attention, the probe achieves an AUC of $0.43$ [$0.21, 0.65$] (consistent with chance) and $0.0\%$ sensitivity [$0.0\%, 49.0\%$] on causal heads.
-    \item \textbf{Induction Circuit Dilution:} Decoupling circuit identity from layer depth via activation patching on IOI and standard held-out repeated-token loss demonstrates that canonical Olsson heads recover $+67.7\%$ logit difference and drive a $+1.84$ nat loss degradation on repeated prefixes, compared to $+17.8\%$ and $+0.29$ nats for probed induction heads (and $+1.2\%$ / $+0.09$ nats for layer-matched late controls). While the probe correlates with prefix scores (AUC 0.790 in Qwen, 0.690 in GPT-2), it shares only $10.2\%$ Jaccard overlap with Olsson heads, heavily diluting the causal circuit with inert units.
+    \item \textbf{Causal Dissociation in Retrieval:} Probed retrieval heads (layers 1, 4, 6 in Qwen; layers 1, 3, 5, 11, 14, 15, 18, 23 in GPT-2) are causally inert on Needle-in-a-Haystack (NIAH: $100.0\% \to 100.0\%$). Needle-attention routing heads in Qwen reside in late layers (15--19), where ablating the top 4 heads (calibrated on 20 trials, evaluated on 100 disjoint trials) collapses accuracy to $37.0\%$ [$28.2\%, 46.8\%$] (while 20 draws of layer-matched late controls retain $97.6\% \pm 1.4\%$). In GPT-2, retrieval routing exhibits high circuit redundancy ($95.0\%$ preserved under 13-head ablation), providing no evidence of necessity for a localized retrieval set in GPT-2. Evaluated against continuous needle-routing attention, the probe achieves an AUC of $0.43$ [$0.21, 0.65$] (consistent with chance) and $0.0\%$ sensitivity [$0.0\%, 49.0\%$] on causal heads.
+    \item \textbf{Induction Circuit Dilution:} Decoupling circuit identity from layer depth via activation patching on IOI and standard held-out repeated-token loss demonstrates that canonical Olsson heads recover $+67.7\%$ logit difference and drive a $+1.84$ nat loss degradation on repeated prefixes, compared to $+17.8\%$ and $+0.29$ nats for probed induction heads (and $+1.2\%$ / $+0.09$ nats for layer-matched late controls). While the probe correlates with prefix scores (AUC 0.790 in Qwen, 0.690 in GPT-2), it shares limited discrete overlap with Olsson heads (10.2\% Jaccard with score $\ge 0.3$; 16.1\% with top-36 ablated heads in Qwen; 7.2\% / 11.1\% in GPT-2), heavily diluting the causal circuit with inert units.
     \item \textbf{The Perplexity Illusion:} Ablating causal retrieval heads collapses NIAH accuracy by $63.0\%$ while shifting WikiText-2 PPL by only $+0.24$ ($20.01 \to 20.25$, an excess of $+0.21$ over late random controls), whereas probed retrieval heads cause $+0.27$ with zero accuracy drop. Relative to capacity controls, general induction ablation incurs an excess PPL penalty of $+1.73$ in Qwen and $+4.13$ in GPT-2.
     \item \textbf{Weight Frobenius Norm Ratios:} Frobenius norm ratios $\|W_V\|_F / \|W_Q\|_F$ are dominated by network depth ($r = 0.635\text{--}0.734$), while within-layer correlations with functional identity are either null (GPT-2, Qwen-0.5B: $r \approx 0.00$) or weak ($r = 0.11\text{--}0.19$ in Qwen-1.5B and LLaMA-3.2, explaining $<3.5\%$ of variance).
-    \item \textbf{Methodological Audit \& Diagnostic Insights:} We reveal that standard synthetic NIAH tasks act as prefix-matching induction tasks due to verbatim prompt repetition. We resolve the random control choke hypothesis, establish a mass-based sink criterion ($>90\%$ BOS mass / $H < 0.50$ bits, identifying 70 sinks in LLaMA), and evaluate GQA query head independence against a layer-conditional permutation null ($50.8\%$ mixed groups observed vs $68.9\%$ expected with sinks, $p < 10^{-4}$). We open-source our audit suite at \url{https://anonymous.4open.science/r/headgenome-mechinterp}.
+    \item \textbf{Methodological Audit \& Diagnostic Insights:} We hypothesize that standard synthetic NIAH tasks act as prefix-matching induction tasks due to verbatim prompt repetition, offering a plausible hypothesis for induction ablation effects. We resolve the random control choke hypothesis, establish a mass-based sink criterion ($\ge 97\%$ BOS mass, corresponding to $H < 0.50$ bits with diffuse remainder, identifying 70 sinks in LLaMA), and evaluate GQA query head divergence against a layer-conditional permutation null ($50.8\%$ mixed groups observed vs $68.9\%$ expected with sinks, $Z = -7.52, p < 10^{-4}$). We open-source our diagnostic audit suite at \url{https://anonymous.4open.science/r/headgenome-mechinterp}.
 \end{itemize}
 
 \section{Related Work}
@@ -87,15 +91,7 @@ where $A_{t, :}^{(l, h)}$ denotes the attention distribution of head $h$ in laye
 It is tempting to define dynamic probing by contrasting short sequences ($L_{\text{short}} = 128$) against long sequences ($L_{\text{long}} = 1024$). However, raw cross-length entropy differences are fundamentally confounded by sequence length. For any diffuse or uniform attention head, entropy naturally scales with context length as $\log_2 L$. Expanding sequence length from 128 to 1024 tokens introduces an automatic baseline entropy increase of $\log_2(1024 / 128) = 3.0$ bits. Unless strictly normalized by $\log_2 L$, raw cross-length shifts measure sequence expansion rather than true key concentration. Therefore, unconfounded probing must compare matched-length prompts.
 
 \paragraph{Canonical Taxonomy Thresholds.}
-Using prompt-contrast entropy $\Delta H$ at fixed length, heads are assigned to mutually exclusive categories:
-\begin{itemize}
-    \setlength{\itemsep}{1pt}
-    \item \textbf{Attention Sink:} Evaluated first; heads directing near-exclusive attention mass to token 0: $H(A_{\text{match}, \text{BOS}}^{(l,h)}) < 0.10$ bits.
-    \item \textbf{Retrieval Candidate:} Attention sharpens on match context: $\Delta H^{(l,h)} \ge +0.30$ bits.
-    \item \textbf{Induction Candidate:} Attention broadens across candidate tokens: $\Delta H^{(l,h)} \le -0.50$ bits.
-    \item \textbf{Local Candidate:} Remaining heads: $-0.50 < \Delta H^{(l,h)} < +0.30$ bits.
-\end{itemize}
-Because retrieval requires $\Delta H \ge +0.30$ and induction requires $\Delta H \le -0.50$, these classes are mutually exclusive by definition.
+Using prompt-contrast entropy $\Delta H$ at fixed length, heads are assigned to mutually exclusive categories: (1)~\textbf{Attention Sink:} Evaluated first; heads directing near-exclusive attention mass to token 0: $H(A_{\text{match}, \text{BOS}}^{(l,h)}) < 0.10$ bits ($>99\%$ BOS mass); (2)~\textbf{Retrieval Candidate:} Attention sharpens on match context: $\Delta H^{(l,h)} \ge +0.30$ bits; (3)~\textbf{Induction Candidate:} Attention broadens across candidate tokens: $\Delta H^{(l,h)} \le -0.50$ bits; and (4)~\textbf{Local Candidate:} Remaining heads: $-0.50 < \Delta H^{(l,h)} < +0.30$ bits. Because retrieval requires $\Delta H \ge +0.30$ and induction requires $\Delta H \le -0.50$, these classes are mutually exclusive by definition.
 
 \begin{figure*}[t]
 \centering
@@ -105,10 +101,10 @@ Because retrieval requires $\Delta H \ge +0.30$ and induction requires $\Delta H
 \end{figure*}
 
 \subsection{LLaMA Sink Threshold Artifact}
-In LLaMA-3.2-1B, applying the rigid $<0.10$ bits threshold yielded exactly 0 sink heads (Figure~\ref{fig:headgenome_atlas}). An architectural audit reveals that this was an artifact of fixed thresholding: the minimum BOS entropy across all 512 heads in LLaMA-3.2-1B is $0.1405$ bits, driven by its 128-dimensional head geometry and RoPE base frequency. Rather than applying a fixed threshold across architectures or relying on an arbitrary percentile cut (which automatically labels 26 heads in any 512-head model), we establish a mass-based criterion: heads directing $\ge 90\%$ of attention mass to token 0 ($A_{\text{BOS}} \ge 0.90$), corresponding to $H(A_{\text{match}, \text{BOS}}) < 0.50$ bits. In LLaMA-3.2-1B, this mass-based criterion identifies 70 sink heads (13.7\% of all 512 query heads), concentrated primarily in early layers (layers 0--5), correctly resolving the zero-sink artifact while avoiding vacuous percentile definitions.
+In LLaMA-3.2-1B, applying the rigid $<0.10$ bits threshold yielded exactly 0 sink heads (Figure~\ref{fig:headgenome_atlas}). An architectural audit reveals that this was an artifact of fixed thresholding: the minimum BOS entropy across all 512 heads in LLaMA-3.2-1B is $0.1405$ bits. We hypothesize this reflects architectural factors such as its 64-dimensional head dimension ($d_{\text{head}} = 2048 / 32 = 64$) and high RoPE base frequency, which maintain slightly higher diffuse attention entropy across sequence positions. Rather than applying a fixed threshold across architectures or relying on an arbitrary percentile cut (which automatically labels 26 heads in any 512-head model), we establish a mass-based criterion: heads directing $\ge 97\%$ of attention mass to token 0 ($A_{\text{BOS}} \ge 0.97$), which corresponds to $H(A_{\text{match}, \text{BOS}}) < 0.50$ bits when the residual $3\%$ is diffuse across 1,024 context tokens. In LLaMA-3.2-1B, this mass-based criterion identifies 70 sink heads (13.7\% of all 512 query heads), concentrated primarily in early layers (layers 0--5), correctly resolving the zero-sink artifact while avoiding vacuous percentile definitions.
 
-\subsection{GQA Query Head Independence}
-Grouped-Query Attention (GQA) shares key and value projection matrices across groups of query heads. We tested whether GQA forces sibling query heads to share functional specializations. Across all 128 GQA groups in LLaMA-3.2-1B (32 query heads, 8 KV heads; 4 query heads per group), under the mass-based sink definition ($H < 0.50$ bits, 70 sinks), \textbf{65 of 128 groups (50.8\%)} contain query heads assigned conflicting behavioral labels. To evaluate whether this reflects true query head specialization or merely layer-level base rates, we evaluate a layer-conditional permutation test ($B=100,000$ draws): shuffling head labels strictly within each layer yields an expected mixed group fraction of $68.9\% \pm 2.4\%$ ($88.3 \pm 3.1$ groups, $p < 10^{-4}$, $Z = -7.43$). Restricting the taxonomy to non-sink classes likewise yields \textbf{35 of 128 mixed groups (27.3\%)} versus an expected null of $38.0\% \pm 1.8\%$ ($48.7 \pm 2.3$ groups, $p < 10^{-4}$). Under both formulations, while sibling query heads show statistically significant clustering towards similar behavioral roles ($p < 10^{-4}$), over a quarter to half of all groups assign conflicting specializations to sibling heads sharing identical KV projections. Furthermore, within-group $\Delta H$ variance accounts for \textbf{33.6\%} of total $\Delta H$ variance across the entire model. Because each query head has an independent linear projection $W_Q$, query heads attend to distinct patterns despite shared keys and values.
+\subsection{Partial Specialization within GQA Groups}
+Grouped-Query Attention (GQA) shares key and value projection matrices across groups of query heads. We tested whether GQA forces sibling query heads to share functional specializations. Across all 128 GQA groups in LLaMA-3.2-1B (32 query heads, 8 KV heads; 4 query heads per group), under the mass-based sink definition ($H < 0.50$ bits, 70 sinks), \textbf{65 of 128 groups (50.8\%)} contain query heads assigned conflicting behavioral labels. To evaluate whether this reflects true query head specialization or merely layer-level base rates, we evaluate a layer-conditional permutation test ($B=100,000$ draws): shuffling head labels strictly within each layer yields an expected mixed group fraction of $68.9\% \pm 2.4\%$ ($88.3 \pm 3.1$ groups, $p < 10^{-4}$, $Z = -7.52$). Restricting the taxonomy to non-sink classes likewise yields \textbf{35 of 128 mixed groups (27.3\%)} versus an expected null of $38.0\% \pm 1.8\%$ ($48.7 \pm 2.3$ groups, $p < 10^{-4}$). Under both formulations, while sibling query heads show statistically significant clustering towards similar behavioral roles ($p < 10^{-4}$), over a quarter to half of all groups assign conflicting specializations to sibling heads sharing identical KV projections. Furthermore, within-group $\Delta H$ variance accounts for \textbf{33.6\%} of total $\Delta H$ variance across the entire model. Because each query head has an independent linear projection $W_Q$, query heads attend to distinct patterns despite shared keys and values.
 
 \begin{table*}[t]
 \centering
@@ -118,7 +114,7 @@ Grouped-Query Attention (GQA) shares key and value projection matrices across gr
 \toprule
 \textbf{Model} & \textbf{Ablation Condition} & \textbf{Selection Metric} & $\mathbf{k}$ & \textbf{Mean Abl. NIAH} & \textbf{Zero Abl. NIAH} & \textbf{PPL} & $\mathbf{\Delta}$ \textbf{PPL} \\
 \midrule
-\multirow{10}{*}{\textbf{Qwen-2.5-0.5B}} 
+\multirow{11}{*}{\textbf{Qwen-2.5-0.5B}} 
 & Dense Baseline & None & 0 & $100.0\%$ [$96.3\%, 100.0\%$] & $100.0\%$ [$96.3\%, 100.0\%$] & 20.01 & $+0.00$ \\
 & Probed Retrieval & $\Delta$-Probe ($\Delta H \ge +0.30$) & 3 & \textbf{100.0\%} [$96.3\%, 100.0\%$] & \textbf{100.0\%} [$96.3\%, 100.0\%$] & 20.28 & $+0.27$ \\
 & Layer-Matched Early Control & Uniform Random (L1--6) & 3 & $100.0\% \pm 0.0\%$ [med $100\%$] & $100.0\% \pm 0.0\%$ [med $100\%$] & 20.02 & $+0.01$ \\
@@ -131,8 +127,9 @@ Grouped-Query Attention (GQA) shares key and value projection matrices across gr
 & Control C: Late-Layer Random & Uniform Random ($L \ge 12$) & 36 & $13.4\% \pm 3.8\%$ [med $2.5\%$] & $11.0\% \pm 3.5\%$ [med $2.0\%$] & 23.04 & $+3.03$ \\
 \cmidrule(lr){2-8}
 & Canonical Sink Heads & Sink Entropy $< 0.10$ & 9 & $98.0\%$ [$93.0\%, 99.5\%$] & $96.0\%$ [$90.2\%, 98.4\%$] & 21.50 & $+1.49$ \\
+& Random Control ($k=9$) & Uniform Random & 9 & $98.4\% \pm 0.8\%$ [med $100\%$] & $98.0\% \pm 0.9\%$ [med $100\%$] & 20.63 & $+0.62$ \\
 \midrule
-\multirow{7}{*}{\textbf{GPT-2-medium}} 
+\multirow{8}{*}{\textbf{GPT-2-medium}} 
 & Dense Baseline & None & 0 & $100.0\%$ [$83.9\%, 100.0\%$] & $100.0\%$ [$83.9\%, 100.0\%$] & 28.68 & $+0.00$ \\
 & Probed Retrieval & $\Delta$-Probe ($\Delta H \ge +0.30$) & 13 & \textbf{100.0\%} [$83.9\%, 100.0\%$] & \textbf{100.0\%} [$83.9\%, 100.0\%$] & 29.16 & $+0.48$ \\
 & Causal Routing Heads & Needle-Attention Score & 13 & $95.0\%$ [$76.4\%, 99.1\%$] & $95.0\%$ [$76.4\%, 99.1\%$] & 29.59 & $+0.91$ \\
@@ -140,10 +137,11 @@ Grouped-Query Attention (GQA) shares key and value projection matrices across gr
 & Top Olsson Induction & Calibration Prefix Score & 45 & \textbf{0.0\%} [$0.0\%, 16.1\%$] & \textbf{0.0\%} [$0.0\%, 16.1\%$] & 38.86 & $+10.18$ \\
 & Dispersed Random Control & Uniform Random ($\le 2$/layer) & 45 & $75.0\% \pm 6.8\%$ [med $90\%$] & $95.0\% \pm 3.2\%$ [med $100\%$] & 34.73 & $+6.05$ \\
 & Canonical Sink Heads & Sink Entropy $< 0.10$ & 15 & $35.0\%$ [$18.1\%, 56.7\%$] & $30.0\%$ [$14.5\%, 51.9\%$] & 38.69 & $+10.01$ \\
+& Random Control ($k=15$) & Uniform Random & 15 & $91.5\% \pm 3.1\%$ [med $95\%$] & $90.0\% \pm 3.5\%$ [med $95\%$] & 30.86 & $+2.18$ \\
 \bottomrule
 \end{tabular}
 }
-\caption{Cross-architecture causal impact of ablated head subsets on Qwen-2.5-0.5B and GPT-2-medium across Needle-in-a-Haystack (NIAH) trials and WikiText-2 Perplexity (PPL). Brackets report 95\% Wilson score confidence intervals for fixed trial sets ($N=100$ in Qwen, $N=20$ in GPT-2), or mean $\pm$ SEM across 20 independent random draws for control groups. Probed retrieval heads are completely inert in both models ($100.0\%$ NIAH preserved). Top needle-attention routing heads (calibrated on 20 trials, evaluated on 100 disjoint trials) collapse Qwen NIAH by 63.0\% with negligible PPL change ($\Delta\text{PPL} = +0.24$), whereas late random controls preserve $97.6\% \pm 1.4\%$ accuracy. In GPT-2, prompts fit within its 1,024-token window; neither probed ($100\%$) nor needle-attention heads ($95\%$) cause collapse, showing retrieval circuit redundancy. Olsson induction heads collapse NIAH to 3.0\% in Qwen and 0.0\% in GPT-2 because standard synthetic queries repeat the needle prefix verbatim.}
+\caption{Cross-architecture causal impact of ablated head subsets on Qwen-2.5-0.5B and GPT-2-medium across Needle-in-a-Haystack (NIAH) trials and WikiText-2 Perplexity (PPL). Brackets report 95\% Wilson score confidence intervals for fixed trial sets ($N=100$ in Qwen, $N=20$ in GPT-2), or mean $\pm$ SEM across 20 independent random draws for control groups. Probed retrieval heads are completely inert in both models ($100.0\%$ NIAH preserved). Top needle-attention routing heads (calibrated on 20 trials, evaluated on 100 disjoint trials) collapse Qwen NIAH by 63.0\% with negligible PPL change ($\Delta\text{PPL} = +0.24$), whereas late random controls preserve $97.6\% \pm 1.4\%$ accuracy. In GPT-2, prompts fit within its 1,024-token window; neither probed ($100\%$) nor needle-attention heads ($95\%$) cause collapse, showing no evidence of localized necessity. Olsson induction heads collapse NIAH to 3.0\% in Qwen and 0.0\% in GPT-2, likely because standard synthetic queries repeat the needle prefix verbatim.}
 \label{tab:causal_main}
 \end{table*}
 
@@ -162,19 +160,19 @@ To unconfound depth from circuit identity, we evaluate depth-matched controls: a
 
 \paragraph{The NIAH Prefix-Matching Induction Confound.}
 Standard synthetic NIAH implementations query the target needle (``The secret word is XXXXX.'') by repeating the prefix verbatim at generation time (``Answer: The secret word is [target]'').
-Mechanistically, this converts retrieval into in-context prefix completion ($[A][B] \dots [A] \to [B]$), directly activating induction copying circuits.
-This explains why ablating canonical Olsson induction heads collapses NIAH to \textbf{3.0\%} in Qwen and \textbf{0.0\%} in GPT-2, while needle-attention heads in GPT-2 barely affect accuracy (\textbf{95.0\%}).
-Without paraphrasing queries to prevent verbatim prefix repetition, standard NIAH conflates distant token retrieval with induction-driven prefix completion.
+Mechanistically, this matches the formal structure of in-context prefix completion ($[A][B] \dots [A] \to [B]$), which we hypothesize engages induction copying circuits.
+This likely explains why ablating canonical Olsson induction heads collapses NIAH to \textbf{3.0\%} in Qwen and \textbf{0.0\%} in GPT-2, while needle-attention heads in GPT-2 barely affect accuracy (\textbf{95.0\%}).
+Without paraphrasing queries to prevent verbatim prefix repetition, synthetic needle recall risks conflating distant token retrieval with induction-driven prefix completion.
 
 \paragraph{GPT-2 Retrieval Redundancy \& Window Verification.}
-In GPT-2-medium, ablating the top 13 needle-attention heads yields \textbf{95.0\% [76.4\%, 99.1\%]} (compared to \textbf{100.0\% [83.9\%, 100.0\%]} for probed retrieval heads, $n=20$). Because their 95\% Wilson confidence intervals overlap, no localized subset of retrieval heads is causally necessary for NIAH in GPT-2; information routing exhibits high circuit redundancy across layers. All evaluated prompts (652 tokens at 70 sentences; 839 tokens in Paul Graham essays) fit comfortably within GPT-2's 1,024-position embedding limit. Consequently, observing that probed retrieval heads are inert ($100.0\%$) is uninformative in GPT-2 because no retrieval set causes collapse there. The causal failure of the probe on retrieval is definitively demonstrated in Qwen-2.5-0.5B.
+In GPT-2-medium, ablating the top 13 needle-attention heads yields \textbf{95.0\% [76.4\%, 99.1\%]} (compared to \textbf{100.0\% [83.9\%, 100.0\%]} for probed retrieval heads, $n=20$). Because their 95\% Wilson confidence intervals overlap, we find no evidence that a localized subset of retrieval heads is causally necessary for NIAH in GPT-2; information routing exhibits high circuit redundancy across layers. All evaluated prompts (652 tokens at 70 sentences; 839 tokens in Paul Graham essays) fit comfortably within GPT-2's 1,024-position embedding limit. Consequently, observing that probed retrieval heads are inert ($100.0\%$) is uninformative in GPT-2 because no retrieval set causes collapse there. The dissociation between the probe's retrieval labels and causal needle routing is demonstrated in Qwen-2.5-0.5B.
 
 \paragraph{Causal Ground Truth vs. Proxy AUC.}
-Evaluating the dynamic probe across all 336 heads in Qwen-2.5-0.5B against the continuous needle-attention proxy yields an \textbf{AUC-ROC of 0.43} with a bootstrap 95\% confidence interval of \textbf{[0.21, 0.65]} ($B=1,000$), statistically indistinguishable from random guessing ($0.50$). Evaluated against true causal knockout heads ($k=4$ heads whose ablation causes $>10\%$ accuracy drop), the probe identifies zero causal heads (\textbf{0.0\% sensitivity}). With $k=4$ positives, observing $0/4$ gives an exact Wilson 95\% CI of $[0.0\%, 49.0\%]$, which excludes high sensitivity ($>50\%$) despite the modest sample of causal heads.
+Evaluating the dynamic probe across all 336 heads in Qwen-2.5-0.5B against the continuous needle-attention proxy yields an \textbf{AUC-ROC of 0.43} with a bootstrap 95\% confidence interval of \textbf{[0.21, 0.65]} ($B=1,000$), statistically indistinguishable from random guessing ($0.50$). Evaluated against the 4 needle-attention routing heads (whose joint ablation causes the 63.0\% collapse in Table~\ref{tab:causal_main}), the probe identifies zero causal heads (\textbf{0.0\% sensitivity}). Under the continuous probe metric $\Delta H$, these 4 heads rank between 135 and 249 out of 336 (median rank 198, all with negative $\Delta H \in [-0.33, -0.06]$ bits). Because the probe labels only 3 heads as retrieval ($\Delta H \ge +0.30$), zero sensitivity is expected from the threshold, but the continuous AUC-ROC of 0.43 confirms that the metric itself does not isolate these routing units. With $k=4$ positives, observing $0/4$ gives an exact Wilson 95\% CI of $[0.0\%, 49.0\%]$, which excludes high sensitivity ($>50\%$) despite the modest sample of causal heads.
 
 \paragraph{Reconciling the Sink Result Across Architectures.}
 In Table~\ref{tab:causal_main}, ablating all 9 canonical sink heads in Qwen-2.5-0.5B leaves NIAH accuracy at \textbf{98.0\%} under mean ablation and \textbf{96.0\%} under zero ablation ($\Delta\text{PPL} = +1.49$). In contrast, in GPT-2-medium, ablating all 15 sinks under mean ablation degrades NIAH accuracy to \textbf{35.0\%} and drives PPL up by \textbf{+10.01} points ($28.68 \to 38.69$). 
-This isolates the architectural mechanism: GPT-2 utilizes learned absolute positional embeddings without RoPE, making global softmax normalization fragile when anchor heads are removed. In contrast, Qwen-2.5-0.5B utilizes RoPE, which naturally attenuates distant query-key dot products and stabilizes autoregressive representations under mean ablation.
+We hypothesize this discrepancy stems from positional encoding mechanics: GPT-2 utilizes learned absolute positional embeddings without RoPE, potentially making global softmax normalization fragile when anchor heads are removed. In contrast, Qwen-2.5-0.5B utilizes RoPE, which naturally attenuates distant query-key dot products and stabilizes autoregressive representations under mean ablation. To isolate whether this reflects sink specificity or generic head knockout, we evaluated random controls matched to sink group sizes: in Qwen ($k=9$), a random control retains $98.4\% \pm 0.8\%$ NIAH accuracy ($\Delta\text{PPL} = +0.62$); in GPT-2 ($k=15$), a random control retains $91.5\% \pm 3.1\%$ NIAH accuracy ($\Delta\text{PPL} = +2.18$). Thus, while random $k=15$ ablations cause moderate degradation in GPT-2, sink ablation collapses accuracy far more severely ($35.0\%$, $\Delta\text{PPL} = +10.01$).
 
 \begin{table}[t]
 \centering
@@ -197,23 +195,11 @@ Layer-Matched Early Control ($L \le 6$) & 3 & $+0.1\%$ [$\pm 0.1\%$] & +0.00 [$\
 \end{table}
 
 \subsection{Activation Patching and Prefix Matching}
-Because raw ablation of 36 heads is susceptible to layer bottleneck choking, we decouple circuit identity from layer depth via two complementary functional evaluations (Table~\ref{tab:activation_patching}):
-\begin{enumerate}
-    \setlength{\itemsep}{0pt}
-    \setlength{\parsep}{0pt}
-    \item \textbf{Activation Patching on IOI:} We measure logit difference recovery on Indirect Object Identification paired contrasts ($N=20$)~\cite{wang2023ioi}. Olsson induction heads recover \textbf{+67.7\%} of clean performance, whereas probed induction heads recover only \textbf{+17.8\%}, and layer-matched late controls recover only \textbf{+1.2\%}.
-    \item \textbf{Held-Out Induction Prefix Benchmark:} Following \citet{olsson2022incontext}, we evaluate language modeling loss on the second half of repeated random token sequences $[A][B]\dots[A][B]$ ($L=128$). To ensure independence, candidate heads were identified on calibration sequences and evaluated on disjoint held-out sequences generated from independent vocabulary seeds ($N=20$). Ablating Olsson heads increases prefix loss by \textbf{+1.84 nats}, whereas ablating probed induction heads increases loss by only \textbf{+0.29 nats}, and layer-matched random controls cause only \textbf{+0.09 nats}.
-\end{enumerate}
-Evaluating the probe's continuous score against prefix-matching score yields an AUC of $0.790$ in Qwen-2.5-0.5B (and $0.690$ in GPT-2-medium). However, the probe's binary induction set shares only 5 of 18 standard Olsson heads in Qwen (Jaccard similarity of $10.2\%$, and $7.2\%$ in GPT-2). Thus, while dynamic probing partially correlates with induction behavior, it heavily dilutes causal induction circuits with non-causal units, explaining why probed heads recover only $+17.8\%$ on IOI and $+0.29$ nats on prefix loss.
+Because raw ablation of 36 heads is susceptible to layer bottleneck choking, we decouple circuit identity from layer depth via two complementary functional evaluations (Table~\ref{tab:activation_patching}): (1)~\textbf{Activation Patching on IOI:} We measure logit difference recovery on Indirect Object Identification paired contrasts ($N=20$)~\cite{wang2023ioi}. Olsson induction heads recover \textbf{+67.7\%} of clean performance, whereas probed induction heads recover only \textbf{+17.8\%}, and layer-matched late controls recover only \textbf{+1.2\%}. (2)~\textbf{Held-Out Induction Prefix Benchmark:} Following \citet{olsson2022incontext}, we evaluate language modeling loss on the second half of repeated random token sequences $[A][B]\dots[A][B]$ ($L=128$). To ensure independence, candidate heads were identified on calibration sequences and evaluated on disjoint held-out sequences generated from independent vocabulary seeds ($N=20$). Ablating Olsson heads increases prefix loss by \textbf{+1.84 nats}, whereas ablating probed induction heads increases loss by only \textbf{+0.29 nats}, and layer-matched random controls cause only \textbf{+0.09 nats}.
+Evaluating the probe's continuous score against prefix-matching score yields an AUC of $0.790$ in Qwen-2.5-0.5B (and $0.690$ in GPT-2-medium). Evaluating discrete overlap, the probe's 36 induction heads share only 5 of 18 standard thresholded Olsson heads ($\text{prefix score} \ge 0.3$, Jaccard $10.2\%$; and 5 of 29 in GPT-2, Jaccard $7.2\%$). Evaluated against the top-36 ablated Olsson induction heads, the sets share 10 heads (Jaccard $16.1\%$, $10/62$; and 9 of 45 in GPT-2, Jaccard $11.1\%$, $9/81$). Thus, while dynamic probing partially correlates with induction behavior, it heavily dilutes causal induction circuits with non-causal units, explaining why probed heads recover only $+17.8\%$ on IOI and $+0.29$ nats on prefix loss.
 
 \subsection{The Perplexity Illusion}
-A common pitfall in pruning and interpretability studies is relying on language modeling perplexity (PPL) to assess model integrity. While it is well-known in language modeling that perplexity is dominated by local n-grams and unigram transitions, interpretability pipelines frequently fall into the trap of citing small $\Delta\text{PPL}$ as evidence of circuit preservation. Our audit exposes this illusion:
-\begin{enumerate}
-    \setlength{\itemsep}{0pt}
-    \setlength{\parsep}{0pt}
-    \item \textbf{Sub-Circuit Dissociation:} Ablating top causal retrieval heads collapses NIAH accuracy from $100.0\%$ to $37.0\%$ ($63.0\%$ drop), yet WikiText-2 PPL shifts by only \textbf{+0.24} points ($20.01 \to 20.25$, an excess of $+0.21$ over late random controls, or $+0.23$ over early controls). In contrast, probed retrieval heads cause $+0.27$ with zero accuracy drop. Perplexity is fundamentally blind to long-range factual routing sub-circuits.
-    \item \textbf{General Induction Disruption:} Conversely, ablating 36 heads of any type incurs a baseline capacity penalty of $\sim +3.0\text{--}+3.1$ PPL. Olsson induction heads impair token repetition globally, driving an excess perplexity penalty of \textbf{+1.73} points over dispersed controls in Qwen ($+4.86$ total shift) and \textbf{+4.13} points over dispersed controls in GPT-2 ($+10.18$ total shift).
-\end{enumerate}
+A common pitfall in pruning and interpretability studies is relying on language modeling perplexity (PPL) to assess model integrity. While it is well-known in language modeling that perplexity is dominated by local n-grams and unigram transitions, interpretability pipelines frequently fall into the trap of citing small $\Delta\text{PPL}$ as evidence of circuit preservation. Our audit exposes this illusion: (1)~\textbf{Sub-Circuit Dissociation:} Ablating top causal retrieval heads collapses NIAH accuracy from $100.0\%$ to $37.0\%$ ($63.0\%$ drop), yet WikiText-2 PPL shifts by only \textbf{+0.24} points ($20.01 \to 20.25$, an excess of $+0.21$ over late random controls, or $+0.23$ over early controls). In contrast, probed retrieval heads cause $+0.27$ with zero accuracy drop. Perplexity is fundamentally blind to long-range factual routing sub-circuits. (2)~\textbf{General Induction Disruption:} Conversely, ablating 36 heads of any type incurs a baseline capacity penalty of $\sim +3.0\text{--}+3.1$ PPL. Olsson induction heads impair token repetition globally, driving an excess perplexity penalty of \textbf{+1.73} points over dispersed controls in Qwen ($+4.86$ total shift) and \textbf{+4.13} points over dispersed controls in GPT-2 ($+10.18$ total shift).
 \textit{Remark on Context Compression:} In context compression (e.g., sliding-window attention with $W=512$), a model maintains near-baseline WikiText PPL while factual retrieval at depth $0.1$ collapses to $20.0\%$ [$8.1\%, 41.6\%$] ($n=20$ trials), reinforcing that perplexity is uninformative for long-context circuit preservation.
 
 \begin{table}[t]
@@ -230,7 +216,7 @@ Control C (Late-Layer: $L \ge 12$) & 0.134 & 0.025 & [0.00, 0.63] & --- \\
 \bottomrule
 \end{tabular}
 }
-\caption{Random ablation controls on Qwen-2.5-0.5B ($k=36$ heads ablated, 20 draws each). Dispersed controls preserve a mean accuracy of $61.9\%$, proving that prior collapses were artifacts of layer bottleneck choking.}
+\caption{Random ablation controls on Qwen-2.5-0.5B ($k=36$ heads ablated, 20 draws each). Dispersed controls preserve a mean accuracy of $61.9\%$, indicating that prior collapses were driven largely by layer bottleneck choking rather than sink collisions.}
 \label{tab:controls}
 \end{table}
 
@@ -239,28 +225,25 @@ Prior investigations observed that random head ablations often degraded accuracy
 We formulated the \textbf{Bottleneck Choke Hypothesis}: unconstrained random sampling across layers frequently knocks out multiple heads from a single layer, choking representation rank.
 
 \paragraph{Olsson Layer Sharing \& Control C.}
-In Qwen-2.5-0.5B, the 36 Olsson induction heads span layers 12--22 (averaging 3.3 heads per layer, peaking at 5 heads in layers 14 and 16). In Table~\ref{tab:controls}, Control C (sampling 36 heads strictly from layers $\ge 12$) yields a median accuracy of only $2.5\%$ (mean $13.4\%$). This demonstrates that raw 36-head ablation conflates algorithmic circuit loss with layer rank starvation, explaining why functional verification via activation patching and prefix loss (Table~\ref{tab:activation_patching}) is strictly required.
+In Qwen-2.5-0.5B, the 36 Olsson induction heads span layers 12--22 (averaging 3.3 heads/layer, peaking at 5 heads in layers 14 and 16). In Table~\ref{tab:controls}, Control C (sampling 36 heads strictly from layers $\ge 12$) yields a median accuracy of only $2.5\%$ (mean $13.4\%$). This demonstrates that raw 36-head ablation conflates circuit loss with layer rank starvation, explaining why functional verification via activation patching and prefix loss (Table~\ref{tab:activation_patching}) is essential.
 
 \paragraph{Testing the Sink Collision Hypothesis.}
-Table~\ref{tab:controls} reports 20 draws per condition ($k=36$ heads). When random ablations are dispersed ($\le 2$ heads/layer, Control A), mean accuracy remains at \textbf{61.9\%} (median \textbf{69.0\%}). Regressing accuracy against sink collisions in Control B yields $R^2 = 0.1556$ ($p = 0.085$). In our sample of $N=20$ draws, the correlation is not statistically significant. While $N=20$ has limited power to detect small secondary effects, layer concentration is clearly the primary driver of task collapse.
+Table~\ref{tab:controls} reports 20 draws per condition ($k=36$). When random ablations are dispersed ($\le 2$ heads/layer, Control A), mean accuracy remains at \textbf{61.9\%} (median \textbf{69.0\%}). Regressing accuracy against sink collisions in Control B yields $R^2 = 0.1556$ ($p = 0.085$, not significant). While $N=20$ has limited power to detect small secondary effects, layer concentration appears to be a substantial contributor to task collapse, though Control A vs.\ C simultaneously varies layer depth and dispersion, leaving their relative contributions partially entangled.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=\columnwidth]{figures/figure9_permutation_null.png}
+\includegraphics[width=0.52\columnwidth]{figures/figure9_permutation_null.png}
 \caption{The Permutation Null test in GPT-2. Dynamic entropy collapse $\Delta H$ on natural English vs.\ shuffled token sequences for induction (Panel A) and retrieval (Panel B). Entropy collapse persists on shuffled text, confirming that dynamic shifts reflect token repetition geometry rather than semantic understanding.}
 \label{fig:permutation_null}
 \end{figure}
 
 \paragraph{Quantitative Permutation Null Test.}
-Figure~\ref{fig:permutation_null} evaluates the Permutation Null test in GPT-2-medium: for the 13 probed retrieval heads specifically, attention cosine similarity remains $0.931 \pm 0.021$, and entropy collapse $\Delta H$ is preserved within $0.038 \pm 0.012$ bits. Across all 384 heads, mean cosine similarity is $0.918 \pm 0.034$, and average entropy collapse difference is $\bar{d} = 0.042 \pm 0.0113$ bits. Two One-Sided Tests (TOST) against an equivalence margin of $\pm 0.10$ bits confirm that entropy collapse is statistically equivalent between natural and shuffled sequences ($t_1 = +12.57, p < 10^{-10}; t_2 = -5.13, p < 10^{-5}$). While prefix-matching induction heads are expected to preserve focus on repeated tokens across shuffled text ($[A][B]\dots[A]$), preserving $\Delta H$ on scrambled text for purported retrieval heads confirms that the probe measures statistical token recurrence geometry rather than syntactic or factual retrieval.
+Figure~\ref{fig:permutation_null} evaluates the Permutation Null test in GPT-2-medium: for the 13 probed retrieval heads specifically, attention cosine similarity remains $0.931 \pm 0.021$, and entropy collapse $\Delta H$ is preserved within $0.038 \pm 0.012$ bits. Across all 384 heads, mean cosine similarity is $0.918 \pm 0.034$, and average entropy collapse difference is $\bar{d} = 0.042 \pm 0.0113$ bits. Two One-Sided Tests (TOST, margin $\pm 0.10$ bits) confirm that entropy collapse is statistically equivalent between natural and shuffled sequences ($t_1 = +12.57, p < 10^{-10}; t_2 = -5.13, p < 10^{-5}$). While prefix-matching induction heads are expected to preserve focus on repeated tokens across shuffled text ($[A][B]\dots[A]$), preserving $\Delta H$ on scrambled text for purported retrieval heads confirms that the probe measures statistical token recurrence geometry rather than factual retrieval.
 
 \section{Weight Geometry Analysis}
 \label{sec:geometry}
 
-It is an intuitive hypothesis in weight-space interpretability that attention head functional classes might be recognized directly from weight projection matrices via the Frobenius norm ratio:
-\begin{equation}
-\mathcal{R}(l, h) = \frac{\|W_V^{(l, h)}\|_F}{\|W_Q^{(l, h)}\|_F}
-\end{equation}
+It is an intuitive hypothesis in weight-space interpretability that attention head functional classes might be recognized directly from weight projection matrices via the Frobenius norm ratio $\mathcal{R}(l, h) = \|W_V^{(l, h)}\|_F / \|W_Q^{(l, h)}\|_F$.
 
 \begin{table}[t]
 \centering
@@ -284,34 +267,30 @@ LLaMA-3.2 (Trained) & $\mathbf{r = +0.635}$ ($p < 10^{-55}$) & $r = +0.108$ ($p 
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.72\columnwidth]{figures/figure8_vq_emergence.png}
+\includegraphics[width=0.38\columnwidth]{figures/figure8_vq_emergence.png}
 \caption{The Frobenius norm ratio $\|W_V\|_F / \|W_Q\|_F$ vs. relative network depth across GPT-2-medium, Qwen-0.5B, Qwen-1.5B, and LLaMA-3.2-1B. Trained networks (solid curves) exhibit a universal upward depth gradient ($r = 0.635\text{--}0.734$), whereas randomly initialized baselines (dashed lines) remain strictly flat isotropic at $1.0$ ($r \approx 0.00\text{--}0.04$).}
 \label{fig:vq_emergence}
 \end{figure}
 
 Table~\ref{tab:geometry} and Figure~\ref{fig:vq_emergence} evaluate this across 1,568 heads in four model architectures:
-\begin{enumerate}
-    \setlength{\itemsep}{0pt}
-    \setlength{\parsep}{0pt}
-    \item \textbf{Random Initialization Null:} The correlation between $\mathcal{R}(l,h)$ and depth $l$ is zero ($r = +0.001\text{--}+0.047$).
-    \item \textbf{Trained Models:} $\mathcal{R}(l,h)$ exhibits an upward gradient with depth ($r = +0.681$ in GPT-2; $r = +0.734$ in Qwen-0.5B; $r = +0.647$ in Qwen-1.5B; $r = +0.635$ in LLaMA-3.2-1B). A pooled layer-clustered OLS regression yields slope $= 0.714$, clustered SE $= 0.106$, $p = 1.9 \times 10^{-11}$.
-    \item \textbf{Within-Layer Functional Correlation:} Controlling for depth, within-layer correlations with functional behavior ($\Delta H$) are either statistically null (GPT-2, Qwen-0.5B) or weak ($r = 0.11\text{--}0.19$ in Qwen-1.5B and LLaMA-3.2), explaining at most $3.5\%$ of variance. Within-layer correlations against needle-attention scores ($r = -0.04$ to $+0.06$) and prefix-matching scores ($r = -0.02$ to $+0.08$) are similarly null.
-\end{enumerate}
-In Grouped-Query Attention (LLaMA-3.2-1B and Qwen-2.5), $W_V$ is shared across query heads within each group; intra-group variation in $\mathcal{R}(l,h)$ is thus driven entirely by $\|W_Q\|_F$.
-This depth gradient likely acts as an empirical regularizer of gradient training: as residual stream norms accumulate with depth, deeper value projections scale up relative to queries. We emphasize the empirical conclusion: the Frobenius ratio is an \textbf{architectural depth gradient}, not a functional class separator.
+(1)~\textbf{Random Initialization Null:} The correlation between $\mathcal{R}(l,h)$ and depth $l$ is zero ($r \approx 0.00\text{--}0.04$, with $r = +0.035$ in GPT-2, $p = 0.49$).
+(2)~\textbf{Trained Models:} $\mathcal{R}(l,h)$ exhibits an upward gradient with depth ($r = +0.681$ in GPT-2; $r = +0.734$ in Qwen-0.5B; $r = +0.647$ in Qwen-1.5B; $r = +0.635$ in LLaMA-3.2-1B; pooled layer-clustered slope $= 0.714$, SE $= 0.106$, $p < 10^{-10}$).
+(3)~\textbf{Within-Layer Functional Correlation:} Controlling for depth, within-layer correlations with functional behavior ($\Delta H$) are either statistically null (GPT-2, Qwen-0.5B) or weak ($r = 0.11\text{--}0.19$ in Qwen-1.5B and LLaMA-3.2, explaining $<3.5\%$ of variance; needle and prefix scores are similarly null).
+In GQA (LLaMA-3.2-1B, Qwen-2.5), $W_V$ is shared across query heads within each group; intra-group variation in $\mathcal{R}(l,h)$ is thus driven entirely by $\|W_Q\|_F$. We hypothesize this depth gradient may act as an empirical regularizer during training: deeper value projections scale up relative to queries as residual stream norms accumulate. Empirically, the Frobenius ratio is an \textbf{architectural depth gradient}, not a functional class separator.
 
 \section{Conclusion}
 \label{sec:conclusion}
 
-Through causal and geometric audits across 1,568 attention heads in three model families (GPT-2, Qwen-2.5, LLaMA-3.2), with systematic causal interventions across 720 heads in two model families (GPT-2-medium and Qwen-2.5-0.5B), we evaluated dynamic entropy-collapse probing. We demonstrated that dynamic probing fails to isolate causal retrieval heads (AUC-ROC 0.43 [0.21, 0.65], 0.0\% sensitivity [0.0\%, 49.0\%] on causal heads), dilutes induction circuits (10.2\% Jaccard overlap with Olsson heads), and mistakes architectural depth gradients for functional weight signatures. Furthermore, we showed that standard synthetic NIAH acts as prefix-matching induction due to verbatim prompt repetition, resolved the random control collapse paradox, and exposed the Perplexity Illusion. Grounding mechanistic interpretability in unconfounded causal interventions is essential for reverse-engineering reliable circuits.
+Across 1,568 heads in three model families (with 720 causally intervened heads in GPT-2 and Qwen-2.5), we audited dynamic entropy probing. Dynamic probing fails to isolate causal retrieval heads (AUC 0.43, 0.0\% sensitivity), dilutes induction circuits (10.2\% Jaccard with thresholded Olsson heads; 16.1\% with ablated heads), and mistakes depth gradients for functional signatures. Furthermore, standard synthetic NIAH tasks risk conflating retrieval with induction due to verbatim prompt repetition, which we hypothesize contributes to the Olsson collapse. Direct causal interventions remain essential for circuit discovery.
 
+\clearpage
 \section*{Limitations}
 This empirical investigation has specific limitations:
 \begin{enumerate}
     \setlength{\itemsep}{1pt}
     \item \textbf{Layer Choking Confounds:} As demonstrated in Section 4.4, ablating large head subsets ($k \ge 36$) is partially confounded by representation rank starvation in deep layers. While activation patching and prefix-loss evaluations successfully decouple circuit identity from layer depth, standard knockout ablation alone cannot fully isolate large sub-circuits.
     \item \textbf{Model Scale Scope:} Our experiments evaluate autoregressive language models up to 1.5 billion parameters (GPT-2-medium, Qwen-2.5-0.5B, Qwen-2.5-1.5B, and LLaMA-3.2-1B). Full causal ablation grids were evaluated on Qwen-2.5-0.5B and GPT-2-medium (720 heads total); LLaMA-3.2 was audited for taxonomic, geometric, and GQA query head independence, without causal ablations. Models exceeding 70B parameters may exhibit different circuit redundancy properties.
-    \item \textbf{Synthetic Retrieval Ground Truth:} Our retrieval evaluations rely on synthetic Needle-in-a-Haystack tasks ($L=1024$) and attention-to-needle metrics~\cite{wu2024retrieval}. Furthermore, standard synthetic NIAH tasks repeat the needle prefix verbatim at query time, creating an induction confound. Multi-hop reasoning and real-world long-context tasks with paraphrased queries may involve richer distributed circuits and MLP interactions.
+    \item \textbf{Synthetic Retrieval Ground Truth:} Our retrieval evaluations rely on standard synthetic Needle-in-a-Haystack tasks ($L=1024$) where query prompts repeat the needle prefix verbatim, creating an induction confound. While our findings demonstrate that Olsson induction knockouts severely degrade performance under this standard setup, evaluating paraphrased queries and natural multi-hop question answering benchmarks without verbatim prefixes is essential to isolate semantic retrieval from prefix copying.
 \end{enumerate}
 
 \section*{Ethical Considerations}
@@ -361,8 +340,9 @@ The pooled total of 1,568 heads across the 4 evaluated models breaks down as fol
     \item GPT-2-medium: 384 heads (311 Local, 45 Induction, 15 Sink, 13 Retrieval)
     \item Qwen-2.5-0.5B: 336 heads (288 Local, 36 Induction, 9 Sink, 3 Retrieval)
     \item Qwen-2.5-1.5B: 336 heads (285 Local, 41 Induction, 4 Sink, 6 Retrieval)
-    \item LLaMA-3.2-1B: 512 query heads (365 Local, 76 Induction, 70 Sink, 1 Retrieval)
-    \item Pooled Sink Heads: $15 + 9 + 4 + 70 = 98$ heads total.
+    \item LLaMA-3.2-1B (canonical $H < 0.10$ bits): 512 query heads (435 Local, 76 Induction, 0 Sink, 1 Retrieval).
+    \item LLaMA-3.2-1B (mass-based $H < 0.50$ bits): 512 query heads (365 Local, 76 Induction, 70 Sink, 1 Retrieval).
+    \item Pooled Sink Heads: 28 heads under the rigid $H < 0.10$ threshold ($15 + 9 + 4 + 0$), or 124 heads under the relaxed $H < 0.50$ threshold ($17 + 21 + 16 + 70$).
     \item Pooled Induction Heads: $45 + 36 + 41 + 76 = 198$ heads total.
 \end{itemize}
 
@@ -399,5 +379,38 @@ Rather than bifurcating into discrete developmental stages, Gaussian Mixture Mod
 \caption{Attention Head Taxonomy Distribution across GPT-2-medium, Qwen-2.5-0.5B, Qwen-2.5-1.5B, and LLaMA-3.2-1B.}
 \label{fig:taxonomy_dist}
 \end{figure}
+
+\section{Responsible NLP Research Checklist}
+\label{sec:checklist}
+\begin{enumerate}
+    \setlength{\itemsep}{1pt}
+    \item \textbf{Claims and Limitations:} 
+    \begin{itemize}
+        \setlength{\itemsep}{0pt}
+        \item \textit{Did you discuss the limitations of your work?} Yes, in the mandatory, standalone \textbf{Limitations} section immediately preceding the References.
+        \item \textit{Did you discuss potential negative societal impacts or risks?} Yes, in the \textbf{Ethical Considerations} section.
+    \end{itemize}
+    \item \textbf{Computational Resources and Infrastructure:}
+    \begin{itemize}
+        \setlength{\itemsep}{0pt}
+        \item \textit{Did you report parameter counts and hardware specifications?} Yes, parameter counts are specified for all architectures (GPT-2-medium 345M, Qwen-2.5-0.5B 490M, Qwen-2.5-1.5B 1.54B, LLaMA-3.2-1B 1.23B); evaluations were executed on a single consumer workstation equipped with an NVIDIA RTX 4090 GPU (<2 total GPU-hours runtime).
+    \end{itemize}
+    \item \textbf{Artifacts, Code, and Reproducibility:}
+    \begin{itemize}
+        \setlength{\itemsep}{0pt}
+        \item \textit{Did you provide code, scripts, and evaluation data?} Yes, all diagnostic suites, ablation hooks, and plotting scripts are open-sourced under the MIT license in the anonymous repository (\url{https://anonymous.4open.science/r/headgenome-mechinterp}).
+        \item \textit{Did you cite and describe existing assets?} Yes, pretrained model releases and WikiText-2 were utilized in compliance with their open research licenses and cited in References.
+    \end{itemize}
+    \item \textbf{Statistical Rigor and Evaluation Protocols:}
+    \begin{itemize}
+        \setlength{\itemsep}{0pt}
+        \item \textit{Did you report error metrics, sample sizes, and confidence intervals?} Yes, exact sample sizes ($N=20$ to $N=100$), standard errors of the mean (SEM), bootstrap intervals ($B=1,000$), and exact 95\% Wilson score intervals are reported for all empirical tables and figures.
+    \end{itemize}
+    \item \textbf{Human Subjects and Evaluation:}
+    \begin{itemize}
+        \setlength{\itemsep}{0pt}
+        \item \textit{Did you involve human participants or private data?} No human subjects, annotators, crowdsourced workers, or private datasets were involved.
+    \end{itemize}
+\end{enumerate}
 
 \end{document}
