@@ -309,9 +309,11 @@ Needle-in-a-Haystack evaluation protocol:
     \item Context length: $L = 1024$ maximum tokens. For GPT-2-medium, prompt lengths were strictly controlled at 652--839 tokens (70 sentences from background corpus; 839 tokens in Paul Graham essays), guaranteeing that prompt plus target answer fits within GPT-2's 1,024-position embedding table.
     \item Haystack: Paul Graham essays and standard background sentence collections.
     \item Needle: ``The secret word is \{word\}.'' Query: ``Question: What is the secret word?\textbackslash nAnswer: The secret word is ''.
-    \item Mean ablation activations were computed by averaging attention head outputs across 50 background text sequences from WikiText-2.
-    \item 95\% Wilson score confidence intervals computed as:
-    $w = \frac{\hat{p} + \frac{z^2}{2n} \pm z\sqrt{\frac{\hat{p}(1-\hat{p})}{n} + \frac{z^2}{4n^2}}}{1 + \frac{z^2}{n}}$ with $z = 1.96$.
+    \item 95\% Wilson score confidence intervals are computed as:
+    \begin{equation*}
+    w = \frac{\hat{p} + \frac{z^2}{2n} \pm z \sqrt{\frac{\hat{p}(1-\hat{p})}{n} + \frac{z^2}{4n^2}}}{1 + \frac{z^2}{n}}
+    \end{equation*}
+    where $\hat{p}$ is the sample proportion, $n$ is the trial count, and $z = 1.96$ corresponds to the 95\% confidence level.
 \end{itemize}
 
 \section{Per-Layer Head Allocations}
@@ -359,26 +361,29 @@ Figure~\ref{fig:kv_geom} illustrates the 3D PCA projection of Key vectors across
 
 \section{Cross-Domain Universality}
 \label{sec:app_cross_domain}
-Figure~\ref{fig:cross_domain} reports cross-domain consistency of attention head entropy profiles across technical code, Wikipedia prose, and legal texts.
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=\columnwidth]{figures/figure10_cross_domain.png}
-\caption{Cross-Domain Universality: Attention head entropy profiles across diverse token distributions.}
-\label{fig:cross_domain}
-\end{figure}
+Figure~\ref{fig:cross_domain} reports empirical attention head entropy distributions and task-contrast dynamic collapse across 1,568 heads in four model families evaluated over diverse prompt domains (geography, science, history, literature, mathematics). Entropy profiles are highly invariant across semantic domains ($r \ge 0.96$).
 
 \section{Taxonomy Distributions and Continuous Depth Profiles}
 \label{sec:app_taxonomy}
 Figure~\ref{fig:taxonomy_dist} reports empirical class fractions across architectures. 
-Rather than bifurcating into discrete developmental stages, Gaussian Mixture Modeling of induction head depths across all 198 heads demonstrates a continuous, unimodal depth distribution: BIC strictly favors 1 component ($\text{BIC}_{k=1} = -184.0$) over 2 components ($\text{BIC}_{k=2} = -168.2$) and 3 components ($\text{BIC}_{k=3} = -152.6$).
+Rather than bifurcating into discrete developmental stages, Gaussian Mixture Modeling of induction head depths across all 198 heads demonstrates a continuous, unimodal depth distribution: BIC strictly favors 1 component with $\text{BIC}_{k=1} = -184.0$, compared to 2 components ($\text{BIC}_{k=2} = -168.2$) and 3 components ($\text{BIC}_{k=3} = -152.6$).
 
-\begin{figure}[h]
+\begin{figure*}[b]
 \centering
-\includegraphics[width=\columnwidth]{figures/taxonomy_distribution.png}
-\caption{Attention Head Taxonomy Distribution across GPT-2-medium, Qwen-2.5-0.5B, Qwen-2.5-1.5B, and LLaMA-3.2-1B.}
+\begin{minipage}[t]{0.48\textwidth}
+\centering
+\includegraphics[width=\linewidth]{figures/figure10_cross_domain.png}
+\caption{Cross-Domain Universality: Empirical attention head entropy distributions ($H$) and task-contrast collapse ($\Delta H$) across diverse token distributions and architectures ($N=1,568$ heads across GPT-2-medium, Qwen-2.5-0.5B, Qwen-2.5-1.5B, and LLaMA-3.2-1B).}
+\label{fig:cross_domain}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\textwidth}
+\centering
+\includegraphics[width=\linewidth]{figures/taxonomy_distribution.png}
+\caption{Attention Head Taxonomy Distribution across GPT-2-medium, Qwen-2.5-0.5B, Qwen-2.5-1.5B, and LLaMA-3.2-1B, displaying empirical proportions of Local, Sink, Induction, and Retrieval heads.}
 \label{fig:taxonomy_dist}
-\end{figure}
+\end{minipage}
+\end{figure*}
 
 \section{Responsible NLP Research Checklist}
 \label{sec:checklist}
